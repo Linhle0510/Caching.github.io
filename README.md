@@ -16,14 +16,14 @@ Rõ ràng máy chủ DNS cũng là một mắt xích trong sơ đồ hoạt đ�
 5. Do trình duyệt đang sử dụng:
   - Các trình duyệt khác nhau có tốc độ tải khác nhau. Nhất là kết nối chậm thì điều này càng phân biệt rõ rệt
 Khác nhau ở cốc cốc, chrome, Firefox, safari...
-  - 
+  - ![Tốc độ duyệt web trên các trình duyệt](toc do duyet web.jpg)
 6. Do mở quá nhiều tab:
   - Nhiều tab gây quá tải CPU và hết Ram.
   - Nhiều tab đang kết nối khiến web chậm
 7. Do máy tính chậm:
   - Trường hợp này thường xảy ra khi 2 máy cạnh nhau nhưng máy nhanh máy chậm. thường là do CPU, Ram và card mạng.
 8. Do có nhiều lượng truy cập vào website.
-## Câu 2: Lập trình viên cần kiểm thử tốc độ (load test) khi dự án sắp hoàn thành (Hoàn thành xong car phần back-end và front-end):
+## Câu 2: Lập trình viên cần kiểm thử tốc độ (load test) khi dự án sắp hoàn thành (Hoàn thành xong c phần back-end và front-end):
 - Load test: Là quá trình kiểm thử khả năng chịu tải dữ liệu thực tế của bất kỳ ứng dụng hoặc trang web nào. Nó đánh giá cách ứng dụng hoạt động trong điều kiện hoạt động bình thường và lượng truy cập tăng cao. Chính vì vậy mà nó được áp dụng cho những dự án gần đi đến giai đoạn hoàn thành.
 ## Câu 3: Thời gian phản hồi của trang ảnh hưởng cực kỳ lớn đến trải nghiệm sử dụng của người dùng:
 - khi website load chậm đồng nghĩa với việc người dùng không đủ kiên nhẫn để chờ đợi
@@ -86,6 +86,68 @@ Khác nhau ở cốc cốc, chrome, Firefox, safari...
   - Thay thế các thẻ table bằng thẻ div: Các trang website được tổ chức với các thẻ TABLE sẽ làm giảm tốc độ tải trang hơn nhiều so với các trang được tổ chức với các thẻ DIV. 
   - Có thể dùng plugin WP Minify Fix để nén tập tin JS và các tập tin CSS, làm cho chúng nhẹ hơn và cải thiện tốc độ load trang.
   ## Câu 7: Phần khó nhất của caching chính là **invalidate**:
+  - invalidate cache là việc xóa dữ liệu cũ, tính toán dữ liệu mới khi dữ liệu bị thay đổi.
+ Phil Karlton đã từng nói: "There are only two hard problems in computer science: Cache invalidation and naming things." Qua câu nói trên đủ để thấy cache invalidation khó như thế nào.
+ - Nếu để cache quá lâu thì dữ liệu sẽ bị stale, nếu refresh quá thường xuyên thì cache trở nên … vô dụng.
+ - Để khắc phục vấn đề này ngừoi ta thường dùng các cơ chế write-xxx cache như sau:
+     - Write-around: Application sẽ update data vào DB trước tiên, sau đó cache mới được update. Đây là cách thông dụng nhất và đáp ứng đa số ứng dụng khi chúng ta cần đảm bảo data được lưu trữ chuẩn xác trong DB. Người ta thường sử dụng 1 process phía sau (ví dụ 1 background job) để refresh cache sau khi action write xảy ra.
+     - Write-through: Application sẽ update cache và DB cùng 1 lúc. Kiểu này làm action write kéo dài hơn write-around nhưng được cái vừa đảm bảo dữ liệu được ghi vào DB vừa đảm bảo data trong cache luôn tươi mới.
+     - Write-behind: Application sẽ update vào cache trước, sau đó mới update data vào DB. Cách này là cách handle những ứng dụng có lượng write lớn và cho phép rủi ro liên quan tới tính toàn vẹn dữ liệu (kiểu các hệ thống counter, analytic, tracking,...) do data có thể mất mát khi chưa được lưu vào DB. Tuy nhiên đây là loại có action write nhanh nhất.
+ ## Câu 8: Giải thích các chú thích trong cache: 
+     
+  -  **@EnableCaching**: Chú thích này kích hoạt một bộ xử lý hậu kỳ sẽ quét mọi Spring bean để tìm sự hiện diện của chú thích trong bộ nhớ đệm trên các phương thức công khai. Nếu không có chỉ định **@EnableCaching** thì **@Cachable, @CachePut, @CacheEvict** không hoạt động.
+   - **@Cacheable** : các giá trị trả về sẽ được bổ sung cache. Đồng thời, khi truy vấn, nó sẽ được lấy từ bộ đệm trước và nếu không tồn tại, nó sẽ bắt đầu truy cập vào cơ sở dữ liệu. 
+   
+      @Cacheable(value = "book", key="id")
+       
+       public Optional<Book> findById(long id) {
+       
+       return books.stream().filter(p -> p.getId() == id).findFirst();
+      
+  }
+  
+  =>kết quả của hàm này sẽ được lưu vào bộ nhớ cache với tên là book. Tức là mỗi lần gọi hàm này nó sẽ kiểm tra với id truyền vào đã có dữ liệu trong cache chưa, nếu có rồi thì nó lấy từ trong cache. Nếu chưa có thì nó chạy vào code bên trong hàm và kết quả trả về sẽ được lưu vào cache với id và đối tượng Book tương ứng.
+    
+  - **@CachePut**:  sử dụng cho các việc bổ sung và sửa đổi dữ liệu trong cache.
+       
+      @CachePut(value="books", key="id")
+  
+      public Book updateBook(ID id, BookDetailDto bookDetail){
+  
+      bookRepository.update(id, bookDetail);   
+  
+      return bookRepository.getBook(id);
+  
+    }
+  
+  => Cập nhật thông tin sách theo id vào cache.
+   - **@CacheEvict**: mỗi lần gọi hàm này nó sẽ xóa toàn bộ dữ liệu ở trong cache.
+     
+      @CacheEvict(value = "books", allEntries=true)
+  
+      public void clearCache() {
+    }
+  
+  => Xóa toàn bộ dữ liệu sách ra khỏi cache.
+  
+  ## Câu 9: Code giả lập trễ: 
+  
+  private void simulateSlowService() {
+  
+  try {
+  
+      long time = 3000L; -> Thời gian trễ tự thiết lập (tính theo mili giây)
+      
+      Thread.sleep(time);
+    
+     } catch (InterruptedException e) {
+      
+     throw new IllegalStateException(e); 
+   }
+   
+  }
+    
+}
   
 
 
