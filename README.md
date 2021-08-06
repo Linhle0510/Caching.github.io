@@ -85,7 +85,7 @@ Khác nhau ở cốc cốc, chrome, Firefox, safari...
   - Thay thế các thẻ table bằng thẻ div: Các trang website được tổ chức với các thẻ TABLE sẽ làm giảm tốc độ tải trang hơn nhiều so với các trang được tổ chức với các thẻ DIV. 
   - Có thể dùng plugin WP Minify Fix để nén tập tin JS và các tập tin CSS, làm cho chúng nhẹ hơn và cải thiện tốc độ load trang.
   ## Câu 7: Phần khó nhất của caching chính là **invalidate**:
-  - invalidate cache là việc xóa dữ liệu cũ, tính toán dữ liệu mới khi dữ liệu bị thay đổi.
+ -  invalidate cache là việc xóa dữ liệu cũ, tính toán dữ liệu mới khi dữ liệu bị thay đổi.
  Phil Karlton đã từng nói: "There are only two hard problems in computer science: Cache invalidation and naming things." Qua câu nói trên đủ để thấy cache invalidation khó như thế nào.
  - Nếu để cache quá lâu thì dữ liệu sẽ bị stale, nếu refresh quá thường xuyên thì cache trở nên … vô dụng.
  - Để khắc phục vấn đề này ngừoi ta thường dùng các cơ chế write-xxx cache như sau:
