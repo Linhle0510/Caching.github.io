@@ -16,7 +16,6 @@ Rõ ràng máy chủ DNS cũng là một mắt xích trong sơ đồ hoạt đ�
 5. Do trình duyệt đang sử dụng:
   - Các trình duyệt khác nhau có tốc độ tải khác nhau. Nhất là kết nối chậm thì điều này càng phân biệt rõ rệt
 Khác nhau ở cốc cốc, chrome, Firefox, safari...
-  - ![Tốc độ duyệt web trên các trình duyệt](toc do duyet web.jpeg)
 6. Do mở quá nhiều tab:
   - Nhiều tab gây quá tải CPU và hết Ram.
   - Nhiều tab đang kết nối khiến web chậm
